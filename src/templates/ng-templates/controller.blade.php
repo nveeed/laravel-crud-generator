@@ -15,10 +15,12 @@ class {{$gen->controllerClassName()}} extends Controller
 {
     public $viewDir = "{{$gen->viewsDirName()}}";
 
-    public function index()
+    public function index(Request $request)
     {
-        $records = {{$gen->modelClassName()}}::findRequested();
-        return $this->view( "index", ['records' => $records] );
+        if ($request->wantsJson()) {
+            return {{$gen->modelClassName()}}::findRequested();
+        }
+        return $this->view("index");
     }
 
     /**
@@ -28,7 +30,7 @@ class {{$gen->controllerClassName()}} extends Controller
      */
     public function create()
     {
-        return $this->view("create");
+        abort(404);
     }
 
     /**
@@ -40,10 +42,7 @@ class {{$gen->controllerClassName()}} extends Controller
     public function store( Request $request )
     {
         $this->validate($request, {{$gen->modelClassName()}}::validationRules());
-
-        {{$gen->modelClassName()}}::create($request->all());
-
-        return redirect('/{{$gen->route()}}');
+        return {{$gen->modelClassName()}}::create($request->all());
     }
 
     /**
@@ -53,7 +52,7 @@ class {{$gen->controllerClassName()}} extends Controller
      */
     public function show(Request $request, {{$gen->modelClassName()}} ${{$gen->modelVariableName()}})
     {
-        return $this->view("show",['{{$gen->modelVariableName()}}' => ${{$gen->modelVariableName()}}]);
+        abort(404);
     }
 
     /**
@@ -63,7 +62,7 @@ class {{$gen->controllerClassName()}} extends Controller
      */
     public function edit(Request $request, {{$gen->modelClassName()}} ${{$gen->modelVariableName()}})
     {
-        return $this->view( "edit", ['{{$gen->modelVariableName()}}' => ${{$gen->modelVariableName()}}] );
+        abort(404);
     }
 
     /**
@@ -74,20 +73,18 @@ class {{$gen->controllerClassName()}} extends Controller
      */
     public function update(Request $request, {{$gen->modelClassName()}} ${{$gen->modelVariableName()}})
     {
-        if( $request->isXmlHttpRequest() )
+        if( $request->wantsJson() )
         {
             $data = [$request->name  => $request->value];
             $validator = \Validator::make( $data, {{$gen->modelClassName()}}::validationRules( $request->name ) );
             if($validator->fails())
                 return response($validator->errors()->first( $request->name),403);
             ${{$gen->modelVariableName()}}->update($data);
-            return "Record updated";
+            return "{{$gen->modelClassName()}} updated.";
         }
 
         $this->validate($request, {{$gen->modelClassName()}}::validationRules());
-
         ${{$gen->modelVariableName()}}->update($request->all());
-
         return redirect('/{{$gen->route()}}');
     }
 
@@ -99,7 +96,7 @@ class {{$gen->controllerClassName()}} extends Controller
     public function destroy(Request $request, {{$gen->modelClassName()}} ${{$gen->modelVariableName()}})
     {
         ${{$gen->modelVariableName()}}->delete();
-        return redirect('/{{$gen->route()}}');
+        return "{{$gen->modelClassName()}} deleted";
     }
 
     protected function view($view, $data = [])

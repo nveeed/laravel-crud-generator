@@ -104,7 +104,7 @@ class Crud extends Command
         // check if the user has directed to add routes
         $str = "nvd-crud routes go here";
         if( strpos( $existingContent, $str ) !== false )
-            return str_replace( $str, "{$str}\n\t".$route, $existingContent );
+            return str_replace( $str, "{$str}\n\t\t".$route, $existingContent );
 
         // check for 'web' middleware group
         $regex = "/(Route\s*\:\:\s*group\s*\(\s*\[\s*\'middleware\'\s*\=\>\s*\[\s*\'web\'\s*\]\s*\]\s*\,\s*function\s*\(\s*\)\s*\{)/";
@@ -163,11 +163,11 @@ class Crud extends Command
     public function generateNgApp()
     {
         if( !file_exists($this->ngAppDir()) ) mkdir($this->ngAppDir());
-        foreach ( ['app','MainController'] as $file ){
+        foreach ( ['app'] as $file ){
             $viewFile = $this->ngAppDir()."/".$file.".js";
             if($this->confirmOverwrite($viewFile))
             {
-                $content = view( $this->templatesDir().'.views.'.$file, [
+                $content = view( $this->templatesDir().'.ng-app.'.$file, [
                     'gen' => $this,
                     'fields' => Db::fields($this->tableName)
                 ]);
@@ -201,8 +201,13 @@ class Crud extends Command
 
     public function ngAppDir()
     {
-        $dirName = str_slug(str_replace("_"," ", $this->tableName));
+        $dirName = $this->ngAppDirName();
         return base_path('public/ng-apps/' . $dirName);
+    }
+
+    public function ngAppDirName()
+    {
+        return str_slug(str_replace("_"," ", $this->tableName));
     }
 
     public function controllerClassName()

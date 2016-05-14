@@ -4,23 +4,25 @@
 ?>
 <?='<?php'?>
 
-/**
- * App\Subject
- *
-@foreach ( $fields as $field )
- * {{'@property integer '.$field}}
-@endforeach
-@foreach ( $fields as $field )
- * {{'@method static \Illuminate\Database\Query\Builder|\App\Subject where'.studly_case($field).'($value)'}}
-@endforeach
- */
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\<?=$gen->modelClassName()?>
+
+ *
+@foreach ( $fields as $field )
+ * @property integer ${{$field->name}}
+@endforeach
+@foreach ( $fields as $field )
+ * @method static \Illuminate\Database\Query\Builder|\App\Subject where{{studly_case($field->name)}}($value)
+@endforeach
+ */
 class <?=$gen->modelClassName()?> extends Model {
 
     public $guarded = ["id","created_at","updated_at"];
+    public $timestamps = false;
 
     public static function findRequested()
     {

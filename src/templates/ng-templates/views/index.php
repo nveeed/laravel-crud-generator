@@ -1,3 +1,7 @@
+<?php
+/* @var $gen \Nvd\Crud\Commands\Crud */
+/* @var $fields [] */
+?>
 @extends('layouts.app')
 
 {{--full width page--}}
@@ -19,20 +23,20 @@
 
     <div class="page-main">
 
-        @include('common.init-ng-app',['app' => 'subjects'])
+        @include('common.init-ng-app',['app' => '<?=$gen->ngAppDirName()?>','appFile' => 'app'])
         <div class="page-header">
-            <h1 class="page-title">Subjects</h1>
+            <h1 class="page-title"><?= $gen->titlePlural() ?></h1>
         </div>
 
         <div class="page-content">
-            <p>This page lists the subjects that are taught in {{$schoolSetting->school_name}}.</p>
+            <p>This page lists the <?= $gen->titlePlural() ?> that are available in {{$schoolSetting->school_name}}.</p>
 
             <div class="row">
-                <nvd-form model="form" on-success="loadSubjects()" action="/subject" class="col-sm-4">
-                    <nvd-form-element field="title">
+                <nvd-form model="form" on-success="load<?= studly_case($gen->tableName) ?>()" action="/<?= $gen->route() ?>" class="col-sm-4">
+                    <nvd-form-element field="category">
                         <div class="input-group">
                             <div class="form-control-wrap">
-                                <input class="form-control" placeholder="Add a New Subject" ng-model="form.title">
+                                <input class="form-control" placeholder="Add a New <?= $gen->titleSingular() ?>" ng-model="form.category">
                             </div>
                             <span class="input-group-btn">
                               <button class="btn btn-primary waves-effect waves-light" type="submit">
@@ -44,16 +48,16 @@
                 </nvd-form>
             </div>
 
-            <div class="main-wrapper row" show-loader="loadingSubjects">
-                <div class="col-sm-3" ng-repeat="subject in subjects">
+            <div class="main-wrapper row" show-loader="loading<?= studly_case($gen->tableName) ?>">
+                <div class="col-sm-3" ng-repeat="<?=$gen->modelVariableName()?> in <?= str_plural($gen->modelVariableName()) ?>">
                     <div class="panel">
                         <div class="panel-heading">
                             <h3 class="panel-title">
-                                <n-editable type="text" name="title" value="subject.title"
-                                            url="/subject/@{{subject.id}}"></n-editable>
+                                <n-editable type="text" name="category" value="<?=$gen->modelVariableName()?>.category"
+                                            url="/<?= $gen->route() ?>/@{{<?= $gen->modelVariableName() ?>.id}}"></n-editable>
                             </h3>
                             <div class="panel-actions">
-                                <delete-btn action="/subject/@{{subject.id}}" on-success="loadSubjects()">
+                                <delete-btn action="/<?= $gen->route() ?>/@{{<?= $gen->modelVariableName() ?>.id}}" on-success="load<?= studly_case($gen->tableName) ?>()">
                                     <i class="fa fa-times"></i>
                                 </delete-btn>
                             </div>
