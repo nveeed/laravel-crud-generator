@@ -45,6 +45,8 @@ class Crud extends Command
         $this->generateRoute();
         $this->generateController();
         $this->generateViews();
+        if(config('crud.generate-ng-app'))
+            $this->generateNgApp();
     }
 
     public function generateRouteModelBinding()
@@ -158,6 +160,24 @@ class Crud extends Command
         }
     }
 
+    public function generateNgApp()
+    {
+        if( !file_exists($this->ngAppDir()) ) mkdir($this->ngAppDir());
+        foreach ( ['app','MainController'] as $file ){
+            $viewFile = $this->ngAppDir()."/".$file.".js";
+            if($this->confirmOverwrite($viewFile))
+            {
+                $content = view( $this->templatesDir().'.views.'.$file, [
+                    'gen' => $this,
+                    'fields' => Db::fields($this->tableName)
+                ]);
+
+                file_put_contents($viewFile, $content);
+                $this->info( "Ng-app file ".$file." generated successfully." );
+            }
+        }
+    }
+
     protected function confirmOverwrite($file)
     {
         // if file does not already exist, return
@@ -177,6 +197,12 @@ class Crud extends Command
     public function route()
     {
         return str_slug(str_replace("_"," ", str_singular($this->tableName)));
+    }
+
+    public function ngAppDir()
+    {
+        $dirName = str_slug(str_replace("_"," ", $this->tableName));
+        return base_path('public/ng-apps/' . $dirName);
     }
 
     public function controllerClassName()
