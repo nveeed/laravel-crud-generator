@@ -42,7 +42,7 @@ class Db
 
     public static function getConditionStr($field)
     {
-        if( in_array( $field->type, ['varchar','text'] ) )
+        if( in_array( $field->type, ['varchar','text','enum','date'] ) )
             return "'{$field->name}','like','%'.\Request::input('{$field->name}').'%'";
         return "'{$field->name}',\Request::input('{$field->name}')";
     }
